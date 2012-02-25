@@ -29,20 +29,20 @@ It contains a script that does the heavy-lifting, a wrapper script that "daemoni
 
 Deny-ssh looks in /var/log/auth.log for entries like this:
 
-	Feb 23 08:12:15 ntp1 sshd[18858]: Failed password for root from 61.253.249.157 port 35849 ssh2
-	Feb 23 08:12:22 ntp1 sshd[18866]: Failed password for root from 61.253.249.157 port 39911 ssh2
-	Feb 23 08:12:29 ntp1 sshd[18875]: Failed password for root from 61.253.249.157 port 43947 ssh2
-	Feb 23 08:12:35 ntp1 sshd[18883]: Failed password for root from 61.253.249.157 port 46722 ssh2
-	Feb 23 08:12:41 ntp1 sshd[18891]: Failed password for root from 61.253.249.157 port 49053 ssh2
-	Feb 23 08:12:48 ntp1 sshd[18899]: Failed password for root from 61.253.249.157 port 51371 ssh2
-	Feb 23 08:12:54 ntp1 sshd[18907]: Failed password for root from 61.253.249.157 port 52842 ssh2
-	Feb 23 23:13:46 ntp1 sshd[24669]: Invalid user trinity from 222.89.142.222
-	Feb 23 23:13:51 ntp1 sshd[24681]: Invalid user pix from 222.89.142.222
-	Feb 23 23:13:59 ntp1 sshd[24701]: Invalid user pix from 222.89.142.222
-	Feb 23 23:14:02 ntp1 sshd[24709]: Invalid user alaurenzana from 222.89.142.222
-	Feb 23 23:14:09 ntp1 sshd[24725]: Invalid user bristow from 222.89.142.222
-	Feb 23 23:14:18 ntp1 sshd[24741]: Invalid user oracle from 222.89.142.222
-	Feb 24 13:30:46 ntp1 sshd[4759]: reverse mapping checking getaddrinfo for 114-207-112-95.tongkni.co.kr [114.207.112.95] failed - POSSIBLE BREAK-IN ATTEMPT!
+	Feb 23 08:12:15 host sshd[18858]: Failed password for root from 61.253.249.157 port 35849 ssh2
+	Feb 23 08:12:22 host sshd[18866]: Failed password for root from 61.253.249.157 port 39911 ssh2
+	Feb 23 08:12:29 host sshd[18875]: Failed password for root from 61.253.249.157 port 43947 ssh2
+	Feb 23 08:12:35 host sshd[18883]: Failed password for root from 61.253.249.157 port 46722 ssh2
+	Feb 23 08:12:41 host sshd[18891]: Failed password for root from 61.253.249.157 port 49053 ssh2
+	Feb 23 08:12:48 host sshd[18899]: Failed password for root from 61.253.249.157 port 51371 ssh2
+	Feb 23 08:12:54 host sshd[18907]: Failed password for root from 61.253.249.157 port 52842 ssh2
+	Feb 23 23:13:46 host sshd[24669]: Invalid user trinity from 222.89.142.222
+	Feb 23 23:13:51 host sshd[24681]: Invalid user pix from 222.89.142.222
+	Feb 23 23:13:59 host sshd[24701]: Invalid user pix from 222.89.142.222
+	Feb 23 23:14:02 host sshd[24709]: Invalid user alaurenzana from 222.89.142.222
+	Feb 23 23:14:09 host sshd[24725]: Invalid user bristow from 222.89.142.222
+	Feb 23 23:14:18 host sshd[24741]: Invalid user oracle from 222.89.142.222
+	Feb 24 13:30:46 host sshd[4759]: reverse mapping checking getaddrinfo for 114-207-112-95.tongkni.co.kr [114.207.112.95] failed - POSSIBLE BREAK-IN ATTEMPT!
 
 There are 3 types of failed attempts that generate a blacklist entry:
 
@@ -58,11 +58,54 @@ In the third, we have to look at the ssh log file, and break it down by 10-minut
 
 That's it!
 
-I install the sysv-init links so that deny-ssh starts *BEFORE* ssh.  Enjoy!
+
+What if I'm scurred?
+--------------------
+
+Totally fine.  I would be a little paranoid, too.  So, I include a CLI switch '-n'.  This shows you what deny-ssh sees in your ssh log, and doesn't write any changes to system files.  This is just a nice script to scan your logs to see if this is even an issue.
+
+When I run it on my machine, I see this:
+
+	host [~/lfs] # deny-ssh -n
+	Using invalid-user threshold of 5
+	Using interval-freq threshold of 7
+	Using reverse-map threshold of 3
+	119.57.72.26 > 5 invalid_user_attempts (12 x)
+	124.117.239.67 > 7 frequency_in_10m_window (406 x)
+	176.53.62.181 > 7 frequency_in_10m_window (36 x)
+	180.153.139.4 > 5 invalid_user_attempts (212 x)
+	202.103.30.24 > 7 frequency_in_10m_window (54 x)
+	203.252.154.194 > 7 frequency_in_10m_window (498 x)
+	208.115.198.173 > 5 invalid_user_attempts (239 x)
+	217.199.212.245 > 7 frequency_in_10m_window (54 x)
+	218.108.230.103 > 7 frequency_in_10m_window (45 x)
+	218.30.22.142 > 7 frequency_in_10m_window (37 x)
+	219.146.225.147 > 7 frequency_in_10m_window (530 x)
+	221.233.134.15 > 5 invalid_user_attempts (783 x)
+	222.87.204.13 > 5 invalid_user_attempts (276 x)
+	222.89.142.222 > 5 invalid_user_attempts (235 x)
+	37.53.255.158 > 7 frequency_in_10m_window (13 x)
+	37.55.27.117 > 7 frequency_in_10m_window (13 x)
+	37.55.89.53 > 7 frequency_in_10m_window (13 x)
+	60.13.176.3 > 7 frequency_in_10m_window (406 x)
+	61.145.116.154 > 7 frequency_in_10m_window (118 x)
+	61.253.249.157 > 7 frequency_in_10m_window (39 x)
+	64.16.224.103 > 7 frequency_in_10m_window (38 x)
+	80.45.169.178 > 5 invalid_user_attempts (197 x)
+	95.132.182.20 > 7 frequency_in_10m_window (13 x)
+	114.207.112.95 > 3 revmap_failures (35 x)
+	217.199.212.245 > 3 revmap_failures (16 x)
+	218.28.228.30 > 3 revmap_failures (12 x)
+
+This "scan-mode" can be run at any time--since it only reads the file and reports its findings, it can even be run while the daemon is running!
+
+The scanning ability is fun--and useful in its own right!
 
 
-FAQ
----
+Okay--I'm convinced.  How do I use this thing?
+----------------------------------------------
+I install the sysv-init links so that deny-ssh starts *BEFORE* ssh.
 
-(Coming soon!)
+Enjoy!
+======
 
