@@ -54,7 +54,7 @@ In the first, we just scan the ssh log for reverse-mapping errors.  If this numb
 
 In the second, we just look at how many invalid-user errors in the ssh log.  If this number exceeds the threshold, we blacklist.
 
-In the third, we have to look at the ssh log file, and break it down by 10-minute windows.  If, in each window, the number of failed attempts exceeds the threshold, we blacklist.
+In the third, we have to look at the ssh log file, and break it down by 10-minute windows.  If, in any window, the number of failed attempts exceeds the threshold, we blacklist.
 
 That's it!
 
